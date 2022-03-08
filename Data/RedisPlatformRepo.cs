@@ -24,7 +24,13 @@ namespace RedisAPI.Data
 
             var serialPlat = JsonSerializer.Serialize(platform);
 
-            db.StringSet(platform.Id, serialPlat);
+            //db.StringSet(platform.Id, serialPlat);
+            //db.SetAdd("PlatformsSet", serialPlat);
+
+            db.HashSet("HashPlatform", new HashEntry[]
+            {
+                new HashEntry(platform.Id,serialPlat)
+            });
         }
 
         public Platform? getPlatformById(string platformId)
@@ -41,10 +47,17 @@ namespace RedisAPI.Data
             return null;
         }
 
-        public IEnumerable<Platform> getAllPlatform()
+        public IEnumerable<Platform?>? getAllPlatform()
         {
             var db = _connectionMultiPlexer.GetDatabase();
-            throw new ArgumentNullException();
+            var CompleteSet = db.SetMembers("PlatformsSet");
+            if (CompleteSet.Length > 0)
+            {
+                var obj = Array.ConvertAll(CompleteSet, val => JsonSerializer.Deserialize<Platform>(val)).ToList();
+                return obj;
+            }
+
+            return null;
         }
     }
 }

@@ -22,11 +22,25 @@ namespace RedisAPI.Controllers
             var platform = _platRepo.getPlatformById(Id);
             if (platform != null)
             {
-                return Ok();
+                return Ok(platform);
             }
 
             return NotFound();
         }
 
+
+        [HttpPost]
+        public ActionResult<Platform> CreatePlatform(Platform platform)
+        {
+            _platRepo.CreatPlatform(platform);
+
+            return CreatedAtRoute(nameof(GetPlatformById), new {Id = platform.Id}, platform);
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<Platform>> GetAllPlatforms()
+        {
+            return Ok(_platRepo.getAllPlatform());
+        }
     }
 }
